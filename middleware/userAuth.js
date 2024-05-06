@@ -13,22 +13,25 @@
 
 // isblock session handle 
 
-const isUser= async (req,res,next)=>{
-    if(req.session.userInfo){
+const isUser = async (req, res, next) => {
+
+    // console.log("asjdfhkjsdhfkjshadkjfhadskjhfkjdsahf",req.session.userInfo);
+
+    if (req.session.userInfo) {
         next()
-    }else {
+    } else {
         res.redirect("/login")
     }
 }
 
 
-const isBlocked = async (req,res,next)=>{
-    if(req.session.isBlocked){
+const isBlocked = async (req, res, next) => {
+    if (req.session.isBlocked) {
         res.redirect("/login")
-    }else{
+    } else {
         next()
     }
 }
 
 
-module.exports = {isUser,isBlocked}
+module.exports = { isUser, isBlocked }

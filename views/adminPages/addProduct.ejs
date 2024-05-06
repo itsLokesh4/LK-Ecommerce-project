@@ -78,12 +78,12 @@
 
       <div class="form-group">
         <label for="images">Add image</label>
-        <input type="file" name="images" class="form-control-file" id="images" multiple>
+        <input type="file" name="images" class="form-control-file" id="images" multiple accept="image/*" >
       </div>
-
+      <!-- accept="image/*" -->
       <br>
 
-    
+
 
       <br>
       <div class="form-group">
@@ -120,7 +120,7 @@
             required: true,
 
           }
-        },  
+        },
 
         submitHandler: async (form, event) => {
 
@@ -135,7 +135,7 @@
           //     formData.append('images', files[i]);
           //   }
           // });
-        
+
 
           let response = await fetch('/addProducts', {
             method: 'POST',

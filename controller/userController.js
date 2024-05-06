@@ -11,6 +11,8 @@ const sendotp = require("../helper/sendOtp")
 const productCollection = require('../model/productModel');
 // categoryCollection
 const categoryCollection = require('../model/categoryModel');
+// walletCollection
+const walletCollection = require('../model/walletModel');
 
 
 
@@ -18,15 +20,17 @@ const categoryCollection = require('../model/categoryModel');
 
 
 
-const landingPage = ( req , res ) =>{
+
+const landingPage = (req, res) => {
     try {
-        if(req.session.logged) {
-            console.log(req.session.logged)
-            res.render("userViews/landingPage", {userName: req.session.logged})
-        }else {
-            res.render("userViews/landingPage",{userName: null})
+        if (req.session.logged) {
+            // console.log(req.session.logged)
+
+            res.render("userViews/landingPage", { userName: req.session.logged })
+        } else {
+            res.render("userViews/landingPage", { userName: null })
         }
-    }catch (err) {
+    } catch (err) {
         console.log(err);
     }
 }
@@ -37,7 +41,7 @@ const signUp = async (req, res) => {
         if (req.session.logged) {
             res.redirect('/')
         } else {
-            res.render('userViews/signup', { userLogged: req.userLogged } )
+            res.render('userViews/signup', { userLogged: req.userLogged })
         }
     } catch (err) {
         console.log(err);
@@ -51,46 +55,47 @@ const login = async (req, res) => {
         } else {
             res.render('userViews/login')
         }
-     }catch (err) {
-        console.log(err);
-     }
-}
-
-
-const logout = async (req,res) =>{
-    try {
-        req.session.logged = false 
-        res.redirect('/')
-    }catch (err) {
+    } catch (err) {
         console.log(err);
     }
 }
 
 
-const otpPage = (req,res) =>{
-   try {
-    if(req.session.user) {
-        res.render('/')
-    }else{
-        res.render('userViews/verifyOtp')
+const logout = async (req, res) => {
+    try {
+        req.session.destroy(() => {
+            res.redirect("/")
+        })
+    } catch (err) {
+        console.log(err);
     }
-   }catch (err) {
-    console.log(err);
-   }
 }
 
 
-const register = async (req,res)=>{
+const otpPage = (req, res) => {
     try {
-       
-        const checkSignin = await userCollection.findOne({ $or: [{email: req.body.email},{phone: req.body.phone}]})
-        
-        if(checkSignin){
-            res.status(208).send({userExists:true})
-        }else{
-            res.status(200).send({userExists:false})
+        if (req.session.user) {
+            res.render('/')
+        } else {
+            res.render('userViews/verifyOtp')
         }
-    }catch (err) {
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+const register = async (req, res) => {
+    try {
+
+        const checkSignin = await userCollection.findOne({ $or: [{ email: req.body.email }, { phone: req.body.phone }] })
+
+        if (checkSignin) {
+            res.status(208).send({ userExists: true })
+        } else {
+            res.status(200).send({ userExists: false })
+        }
+    } catch (err) {
         console.log(err);
     }
 }
@@ -101,12 +106,19 @@ const saveUser = async (req, res) => {
 
         const bycryptpassword = bcrypt.hashSync(req.body.password, 10)
         const newUser = new userCollection({
-            name: req.body.name,
+            fname: req.body.fname,
+            lname: req.body.lname,
             email: req.body.email,
             password: bycryptpassword,
             phone: req.body.phone
         })
         await newUser.save()
+
+        req.session.userInfo = newUser;
+        const userdetails = req.session.userInfo
+        req.session.userName = userdetails.fname
+
+
 
         req.session.logged = await userCollection.findOne({ email: req.body.email })
 
@@ -171,18 +183,20 @@ const resendOtp = async (req, res) => {
 const userLogin = async (req, res) => {
     try {
         const user = await userCollection.findOne({ email: req.body.email })
-      
-        if(user.isBlocked){
-         
-            req.session.logged=false
+        user.isBlocked
+
+        if (user.isBlocked) {
+
+            req.session.logged = false
             res.redirect('/login')
         }
 
-
         if (user) {
+
             const passwordMatch = await bcrypt.compare(req.body.password, user.password)
             if (passwordMatch) {
                 req.session.logged = user
+                req.session.userInfo = user
                 res.redirect('/')
             } else {
                 res.send({ invalid: true })
@@ -202,7 +216,7 @@ const userLogin = async (req, res) => {
 const sendOtp = (req, res) => {
     // Assuming 'verifyOtp' view file is located in the 'views/userViews' directory
     const viewFilePath = path.join(__dirname, '..', 'views', 'userViews', 'otpPage');
-    
+
     // Render the view file
     res.render(viewFilePath, { /* optional data to pass to the view */ });
 };
@@ -219,14 +233,17 @@ module.exports = {
 const singleProduct = async (req, res) => {
     try {
         const productDetails = await productCollection.findOne({ _id: req.query.id }).populate('parentCategory')
-     console.log(req.query)
+        // console.log(req.query)
         // const categoryDetails = await categoryCollection.findOne({ _id: req.query.id })
-        console.log(productDetails)
-        res.render('userViews/singleProduct', { _id:req.body.user_id, userLogged: req.session.logged, productDet: productDetails })
+        // console.log(productDetails)
+        res.render('userViews/singleProduct', { _id: req.body.user_id, userLogged: req.session.logged, productDet: productDetails })
     } catch (err) {
         console.log(err);
     }
 }
+
+
+
 
 // { product: product }
 
@@ -234,32 +251,97 @@ const singleProduct = async (req, res) => {
 const shopPage = async (req, res) => {
     try {
         const productDetails = await productCollection.find()
-        res.render('userViews/shop', { productDet: productDetails })      
-     }
-    
-     catch (err) {
+        res.render('userViews/shop', { productDet: productDetails })
+    }
+
+    catch (err) {
         console.log(err);
     }
 }
 
+
+
+
 // userProfilefn
 
-const userProfilefn = async (req,res)=>{
-    try{
+const userProfilefn = async (req, res) => {
+    try {
         const currentUser = req.session.userInfo
-        const walletBalance = await walletCollection.findOne({userId:currentUser._id})
-        console.log("profile inn")
-        console.log(walletBalance)
-        const userInfo = await userCollection.findById({_id:currentUser._id})
-        res.render("user/Profilepage",{userInfo,walletBalance:walletBalance})  
-    }catch (err){
+        const walletBalance = await walletCollection.findOne({ userId: currentUser._id })
+        const userInfo = await userCollection.findById({ _id: currentUser._id })
+        res.render("userViews/Profilepage", { userInfo, walletBalance: walletBalance })
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+const ProfileEditpage = async (req, res) => {
+    try {
+        const currentUser = req.session.userInfo
+        const userInfo = await userCollection.findById({ _id: currentUser._id })
+        res.render("userViews/editProfile", { userInfo })
+    } catch (err) {
         console.log(err)
     }
 }
 
 
+const postEditprofilefn = async (req, res) => {
+    try {
+        const newUser = {
+            fname: req.body.fname,
+            lname: req.body.lname,
+            phone: req.body.phone
+        };
+        console.log(newUser)
+        const updateUser = await userCollection.findByIdAndUpdate({ _id: req.params.id }, newUser);
+        res.redirect("/Profile");
+
+    } catch (err) {
+        console.log(err)
+    }
+}
 
 
+const passchange = async (req, res) => {
+    try {
+        res.render("userViews/passChange", {
+            invalidCurrentPassword: req.session.invalidCurrentPassword,
+
+        });
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+
+const PostpassChange = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body
+        const user = req.session.userInfo
+
+        const comparePass = bcrypt.compareSync(currentPassword, user.Password)
+
+
+        if (comparePass) {
+            const encrypted = bcrypt.hashSync(newPassword, 10)
+            await userCollection.findByIdAndUpdate(
+                { _id: user._id },
+                { $set: { Password: encrypted } }
+            );
+            res.json({ success: true });
+        } else {
+            res.send({ invalidPassword: true })
+        }
+
+
+        console.log("12345678")
+
+    } catch (err) {
+        console.log(err)
+    }
+}
 
 
 
@@ -276,5 +358,9 @@ module.exports = {
     userLogin,
     singleProduct,
     shopPage,
-    userProfilefn
+    userProfilefn,
+    ProfileEditpage,
+    postEditprofilefn,
+    passchange,
+    PostpassChange
 }

@@ -3,10 +3,14 @@ const mongoose = require("mongoose")
 
 // create schema (in which format data will go )
 const userSchema = new mongoose.Schema({
-    name:{
+    fname:{
         require:true,
         type:String
     },
+    lname:{
+      require:true,
+      type:String
+   },
     email:{
         required:true,
         type:String

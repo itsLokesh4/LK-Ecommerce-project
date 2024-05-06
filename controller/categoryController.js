@@ -4,53 +4,53 @@ const categoryCollection = require('../model/categoryModel')
 const productCollection = require('../model/productModel')
 
 
-const categoryManagement = async (req,res) =>{
+const categoryManagement = async (req, res) => {
     try {
-        const catcollection = await categoryCollection.find().sort({_id:-1})
-        res.render('adminPages/categoryManagement', {categoryDet: catcollection})
+        const catcollection = await categoryCollection.find().sort({ _id: -1 })
+        res.render('adminPages/categoryManagement', { categoryDet: catcollection })
 
-    }catch (err) {
+    } catch (err) {
         console.log(err)
     }
 }
 
 
-const addCategory = async (req, res) =>{
+const addCategory = async (req, res) => {
     try {
         const newCategory = new categoryCollection({
             categoryName: req.body.categoryName,
             categoryDescription: req.body.categoryDes
-    })
+        })
 
-    // const catExists = await categoryCollection,findOne({categoryName: req.body.categoryName})
-    const catExists = await categoryCollection.findOne({
-        categoryName:{$regex: new RegExp('^' +req.body.categoryName + '$','i')}
-    });
+        // const catExists = await categoryCollection,findOne({categoryName: req.body.categoryName})
+        const catExists = await categoryCollection.findOne({
+            categoryName: { $regex: new RegExp('^' + req.body.categoryName + '$', 'i') }
+        });
 
-    if(catExists) {
-        res.send({invalid:true})
-    }else {
-        newCategory.save()
-        res.send({success: true})
+        if (catExists) {
+            res.send({ invalid: true })
+        } else {
+            newCategory.save()
+            res.send({ success: true })
+        }
+    } catch (err) {
+        console.log(err)
     }
-}catch (err) {
-    console.log(err)
-}
 }
 
 
-const categoryList = async (req,res) =>{
+const categoryList = async (req, res) => {
     try {
-        let catList 
-        if(req.query.action === 'list'){
-            catList = true 
-        }else {
+        let catList
+        if (req.query.action === 'list') {
+            catList = true
+        } else {
             catList = false
         }
-        await productCollection.updateMany({parentCategory: req.query.id},{$set:{isListed: catList}})
+        await productCollection.updateMany({ parentCategory: req.query.id }, { $set: { isListed: catList } })
         await categoryCollection.updateOne({ _id: req.query.id }, { $set: { isListed: catList } })
         res.send({ list: catList })
-    }catch (err){
+    } catch (err) {
         console.log(err)
     }
 }
@@ -76,7 +76,7 @@ const editCategory = async (req, res) => {
 }
 
 
-module.exports ={
+module.exports = {
     categoryList,
     categoryManagement,
     addCategory,

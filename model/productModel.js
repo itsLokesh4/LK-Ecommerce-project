@@ -12,4 +12,8 @@ const productSchema = new mongoose.Schema({
   isListed: { type: Boolean, default: true },
 });
 
-module.exports =  mongoose.model("products", productSchema)
+// module.exports =  mongoose.model("products", productSchema)
+
+
+
+module.exports= mongoose.model('products',productSchema)

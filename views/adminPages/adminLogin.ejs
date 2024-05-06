@@ -11,7 +11,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login - Jkart</title>
+  <title>Login - Lk cart</title>
 
   <!-- PLUGINS CSS STYLE -->
   <link href="assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -79,9 +79,9 @@
             </div>
 
             <div class="col-8 header-sm-logo-area">
-              
+
               <img src="./assets/img/logo.png" alt="logo">
-              
+
             </div>
 
             <div class="col-2">
@@ -111,7 +111,7 @@
                     </div>
                   </a>
 
-                 
+
                 </li>
               </ul>
             </div>
@@ -120,16 +120,16 @@
       </div>
 
 
-    
+
       <!-- NAVBAR -->
       <nav class="navbar navbar-main navbar-default navbar-expand-md navbar-scrollUp navbar-sticky d-none d-md-block"
         role="navigation">
         <div class="container">
           <!-- Brand and toggle get grouped for better mobile display -->
           <img src="./assets/img/logo1.png" alt="gg">
-          
+
           <h1>LK Cart</h1>
-         
+
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse"
             aria-controls="navbar-ex1-collapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="fa fa-bars"></span>
@@ -137,8 +137,8 @@
 
 
           <!-- Collect the nav links, forms, and other content for toggling -->
-        
-          
+
+
         </div>
       </nav>
     </div>
@@ -147,7 +147,7 @@
     <!-- ====================================
           â€”â€”â€” LEFT SIDEBAR WITH OUT FOOTER
         ===================================== -->
-    
+
 
 
     <!-- HEADER FORM -->
@@ -173,7 +173,7 @@
 
 
     <!-- LIGHT SECTION -->
-   
+
 
     <!-- MAIN CONTENT SECTION -->
     <section class="mainContent clearfix logIn">
@@ -182,7 +182,7 @@
           <div class="col-md-7 col-lg-8 col-xl-7 col-12">
             <div class="panel panel-default">
               <div class="panel-heading">
-                <h3>log in</h3>
+                <h3>Admin Login </h3>
               </div>
 
 
@@ -201,7 +201,7 @@
                     <input type="password" placeholder="Password*(At least 6 characters long)" name="password"
                       id="password" class="form-control" />
                   </div>
-                  
+
 
                   <button type="submit" class="btn btn-primary btn-default w-100">Login</button>
                 </form>
@@ -232,13 +232,13 @@
                       })
                       let result = await response.json()
 
-                      if(result.success){
+                      if (result.success) {
                         window.location.href = '/admin'
-                      }if(result.invalidPass){
+                      } if (result.invalidPass) {
                         await Swal.fire({
-                            icon: "error",
-                            title: "Oops...",
-                            text: "Invalid Email/Password!",
+                          icon: "error",
+                          title: "Oops...",
+                          text: "Invalid Email/Password!",
                         });
                       }
                     }
@@ -253,10 +253,10 @@
                   <div class="row row-cols-1 row-cols-lg-2">
 
 
-                   
+
                     <!-- <div><button type="submit" onclick="location.href='javascripr:void(0)';"
             class="btn btn-primary btn-default w-100">Sign UP</button></div> -->
-                   
+
 
                   </div>
 
@@ -330,7 +330,7 @@
             </div>
           </div>
 
-          
+
         </div>
       </div>
     </div>
@@ -340,7 +340,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md-7 col-12">
-            <p>&copy; <span id="copy-year"></span> Copyright  <a target="_blank"
+            <p>&copy; <span id="copy-year"></span> Copyright <a target="_blank"
                 href="http://www.iamabdus.com/">Jkart</a>.</p>
           </div>
           <div class="col-md-5 col-12">

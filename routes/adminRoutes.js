@@ -11,24 +11,24 @@ const router = express.Router()
 
 // login
 router.get('/admin', adminController.loginPage)
-router.post('/adminlogin',adminController.adminlogin)
-router.get('/adminLogout',adminController.adminLogout)
+router.post('/adminlogin', adminController.adminlogin)
+router.get('/adminLogout', adminController.adminLogout)
 
 
 
 // userManagement 
-router.get('/userManagement',adminAuth,adminController.userManagement)
-router.get('/userBlock',adminController.userBlock)
+router.get('/userManagement', adminAuth, adminController.userManagement)
+router.get('/userBlock', adminController.userBlock)
 
 
 
 // product Management
-router.get('/productManagement',adminAuth,productController.productManagement)
-router.get('/productList',productController.productList)
-router.get('/addProduct',adminAuth,productController.addProductGet)
-router.post('/addProducts',adminAuth,upload.any(),productController.addProducts)
-router.get('/editProduct',adminAuth,productController.editProduct)
-router.post('/editProducts/:id',adminAuth,upload.any(),productController.editProducts)
+router.get('/productManagement', adminAuth, productController.productManagement)
+router.get('/productList', productController.productList)
+router.get('/addProduct', adminAuth, productController.addProductGet)
+router.post('/addProducts', adminAuth, upload.any(), productController.addProducts)
+router.get('/editProduct', adminAuth, productController.editProduct)
+router.post('/editProducts/:id', adminAuth, upload.any(), productController.editProducts)
 
 
 
@@ -36,10 +36,10 @@ router.post('/editProducts/:id',adminAuth,upload.any(),productController.editPro
 
 // category Management 
 
-router.get('/categoryManagement',adminAuth,categoryController.categoryManagement)
-router.post('/addCategory',categoryController.addCategory)
-router.get('/categoryList',categoryController.categoryList)
-router.post('/editCategory',categoryController.editCategory)
+router.get('/categoryManagement', adminAuth, categoryController.categoryManagement)
+router.post('/addCategory', categoryController.addCategory)
+router.get('/categoryList', categoryController.categoryList)
+router.post('/editCategory', categoryController.editCategory)
 
 
 

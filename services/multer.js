@@ -9,7 +9,13 @@ const storage = multer.diskStorage({
     filename : function (req, file ,cb){
         const uniqueSuffic = Date.now() + '-' + Math.round(Math.random() * 1E9)
         cb(null, file.fieldname + '-' + uniqueSuffic + path.extname(file.originalname))
-    }
+    },
+    fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+          return cb(new Error('Only image files are allowed!'));
+        }
+        cb(null, true);
+      }
 })
 
 

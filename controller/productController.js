@@ -86,14 +86,14 @@ const editProducts = async (req, res) => {
         console.log(req.files)
         if (req.files.length < 3) {
             res.send({ noImage: true })
-        } else{
+        } else {
             var imgFiles = []
             for (let i = 0; i < req.files.length; i++) {
                 imgFiles[i] = req.files[i].filename
             }
         }
-           
-       
+
+
 
         const productDetails = await productCollection.find({ _id: { $ne: req.params.id }, productName: { $regex: new RegExp('^' + req.body.productName.toLowerCase() + '$', 'i') } })
         if (/^\s*$/.test(req.body.productName) || /^\s*$/.test(req.body.productPrice) || /^\s*$/.test(req.body.productStock)) {

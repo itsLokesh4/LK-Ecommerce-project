@@ -2,17 +2,19 @@ const express = require("express")
 const app = express();
 const path = require("node:path");
 const session = require("express-session")
+const multer = require('multer')
+
 
 const dotenv = require("dotenv").config();
 
 
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-app.use(express.static(path.join(__dirname,"public")));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use((req,res,next) =>{
-    res.set("Cache-Control","no-store");
+app.use((req, res, next) => {
+    res.set("Cache-Control", "no-store");
     next();
 })
 
@@ -20,8 +22,8 @@ app.use((req,res,next) =>{
 app.use(
     session({
         secret: process.env.SESSIONSECRET,
-        resave:true,
-        saveUninitialized:true,
+        resave: true,
+        saveUninitialized: true,
     })
 );
 
@@ -31,7 +33,7 @@ const dbConnect = require("./config/config.js")
 dbConnect()
 
 
-app.set("view engine","ejs");
+app.set("view engine", "ejs");
 
 
 
@@ -45,6 +47,6 @@ app.use(adminRouter);
 
 
 
-app.listen(process.env.PORT , ()=>{
+app.listen(process.env.PORT, () => {
     console.log("Server run successfully")
 })

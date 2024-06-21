@@ -15,12 +15,15 @@ const productManagement = async (req, res) => {
 
 const productList = async (req, res) => {
     try {
+        console.log("khkjgjsdhsdf")
         let productList
         if (req.query.action === 'list') {
             productList = false
         } else {
             productList = true
         }
+        console.log(productList)
+        console.log(req.query.id)
         await productCollection.updateOne({ _id: req.query.id }, { $set: { isListed: productList } })
         res.send({ list: productList })
     } catch (err) {
@@ -83,17 +86,32 @@ const editProduct = async (req, res) => {
 
 const editProducts = async (req, res) => {
     try {
-        console.log(req.files)
-        if (req.files.length < 3) {
-            res.send({ noImage: true })
+        // console.log(req.files)
+        // if (req.files.length < 3) {
+        //     res.send({ noImage: true })
+        // } else{
+        //     var imgFiles = []
+        //     for (let i = 0; i < req.files.length; i++) {
+        //         imgFiles[i] = req.files[i].filename
+        //     }
+        // }
+           
+        let imgFiles = [];
+        if (req.files.length === 0) {
+            // No new images uploaded, retain existing images
+            const existingProduct = await productCollection.findOne({ _id: req.params.id });
+            imgFiles = existingProduct.productImage;
         } else {
-            var imgFiles = []
+            // New images uploaded
+            const existingProduct = await productCollection.findOne({ _id: req.params.id });
+            imgFiles = existingProduct.productImage || [];
+
+            // Append new image filenames to the existing ones
             for (let i = 0; i < req.files.length; i++) {
-                imgFiles[i] = req.files[i].filename
+                imgFiles.push(req.files[i].filename);
             }
         }
-
-
+       
 
         const productDetails = await productCollection.find({ _id: { $ne: req.params.id }, productName: { $regex: new RegExp('^' + req.body.productName.toLowerCase() + '$', 'i') } })
         if (/^\s*$/.test(req.body.productName) || /^\s*$/.test(req.body.productPrice) || /^\s*$/.test(req.body.productStock)) {
@@ -121,7 +139,20 @@ const editProducts = async (req, res) => {
     }
 }
 
+
+
+const deleteProduct = async (req, res) => {
+    try {
+            console.log(req.query.id) 
+        await productCollection.updateOne({ _id: req.query.id }, { $set: { isDeleted: true } })
+        res.send({ deleted: true })
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
 module.exports = {
     productManagement, productList, addProductGet, addProducts,
-    editProduct, editProducts
+    editProduct, editProducts,deleteProduct
 }

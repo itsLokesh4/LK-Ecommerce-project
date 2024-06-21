@@ -39,7 +39,7 @@ const saveaddressfn = async (req, res) => {
     // console.log(req.body)
     const userAddress = {
         userId: user._id,
-        fname: req.body.name,
+        fname: req.body.fname,
         phone: req.body.phone,
         Address: req.body.Address,
         State: req.body.State,
@@ -65,7 +65,7 @@ const postEditAddressfn = async (req, res) => {
     try {
         // console.log(req.body)
         const address = {
-            fname: req.body.name,
+            fname: req.body.fname,
             phone: req.body.phone,
             Address: req.body.Address,
             State: req.body.State,

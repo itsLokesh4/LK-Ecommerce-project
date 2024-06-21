@@ -62,7 +62,7 @@
                 <div class="row checkboxArea">
                   <div class="form-group col-md-6 col-12">
                     <label for="">Name</label>
-                    <input type="" class="form-control" value="<%= address.name %>" disabled>
+                    <input type="" class="form-control" value="<%= address.fname %>" disabled>
                   </div> 
                   <div class="form-group col-md-6 col-12">
                     <label for="">Address</label>
@@ -70,7 +70,7 @@
                   </div>
                   <div class="form-group col-md-6 col-12">
                     <label for="">Phone</label>
-                    <input type="text" class="form-control" value="<%= address.Phone %>" disabled>
+                    <input type="text" class="form-control" value="<%= address.phone %>" disabled>
                   </div>
                   <div class="form-group col-md-6 col-12">
                     <label for="">City</label>
@@ -107,11 +107,11 @@
                       <label for="checkbox2"><span></span>Razor Pay</label>
                       <small>Delivered in 4-7 business days.</small>
                     </div>
-                    <div class="col-12 col-lg-6 mb-4">
+                    <!-- <div class="col-12 col-lg-6 mb-4">
                       <input id="checkbox2" type="radio" name="checkbox" value="Wallet">
                       <label for="checkbox2"><span></span>Wallet</label>
                       <small>Delivered in 4-7 business days.</small>
-                    </div>
+                    </div> -->
                   </div>
                   <div class="col-12">
                     <div class="well well-lg clearfix">
@@ -180,20 +180,7 @@
               </tbody>
               
             </table>
-            <div style="background-color:#46b9b4; padding: 20px; margin: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-              <div class="coupon-container" >
-                <% coupons.reverse().forEach(function(coupon) { %>
-                  <div class="coupon-card" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px; background-color: #f9f9f9;">
-                    <h4><%= coupon.couponCode %></h4>
-                    <p style="margin-top: 10px;" >Discount: <%= coupon.discountPercentage %>%</p>
-                    <p>Minimum Purchase: <%= coupon.minimumPurchase %></p>
-                  </div>
-                <% }); %>
-                
-
-              </div>
-            </div>
-            
+           
           </div>
           <!--  /cartMiniTable-->
 

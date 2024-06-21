@@ -2,7 +2,10 @@ const { ObjectId } = require('mongodb');
 const cartCollection = require('../model/cartModel')
 const productCollection = require('../model/productModel')
 const userCollection = require("../model/userModel");
+const addressCollection = require("../model/addressModel")
+const orderCollection = require("../model/orderModel")
 const mongoose = require('mongoose');
+const couponCollection = require('../model/couponModel')
 
 // const ObjectId = mongoose.Types.ObjectId;
 
@@ -73,7 +76,7 @@ const cartpagefn = async (req, res) => {
   
       // Get cart products
       const cartProducts = await cartCollection.find({ userId: userInfo._id });
-     console.log(cartProducts);
+    //  console.log(cartProducts);
       res.render("userViews/cartpage", {
         user: req.session?.userInfo,
         userCartData,
@@ -189,15 +192,15 @@ const cartpagefn = async (req, res) => {
 
 const addtoCart = async (req, res) => {
 
-    // console.log(pro);
+    // console.log(existingProduct);
     try {
-      let existingProduct = null;
+    //   var existingProduct = null;
     //   let prodID = String(req.query.prodId)
-      existingProduct = await cartCollection.findOne({
+       var  existingProduct = await cartCollection.findOne({
         userId: req.session.userInfo._id,
         productId: req.query.prodId,
       });
-  
+    //    console.log(req.query)
       const productss = await productCollection.findOne({ _id: req.query.prodId });
   
       // Check if the productId exists
@@ -219,8 +222,9 @@ const addtoCart = async (req, res) => {
           },
         ]);
       }
-      console.log("srghyhfjk,ktet");
-      res.send({success:true})
+    //   console.log("srghyhfjk,ktet");
+    //   res.render('userViews/cartpage',{ empty })
+    res.redirect("/cart");
         
 
     } catch (error) {
@@ -350,19 +354,121 @@ const orderPlaced = async (req, res) => {
 };
 
 
+// const orderPlacedEnd = async (req, res) => {
+//     try {
+//         // redirect to the order placed page
+//         res.redirect("userViews/checkout2");
+//     } catch (error) {
+//         console.error(error);
+//     }
+// };
+
+
 const orderPlacedEnd = async (req, res) => {
-    try {
-        // redirect to the order placed page
-        res.redirect("userViews/checkout2");
-    } catch (error) {
-        console.error(error);
-    }
+  try {
+  let cartData = await cartCollection
+    .find({ userId: req.session.userInfo._id })
+    .populate("productId");
+
+  for (const item of cartData) {
+    item.productId.productStock -= item.productQuantity; // we use for reducing Qyantity
+    item.productId.stockSold += 1;  //stocjSolf ++
+    await item.productId.save();
+  }
+
+  cartData.map(async (v) => {
+    v.productId.productStock -= v.productQuantity; //reducing from stock qty
+    await v.productId.save();
+    return v;
+  })
+  let orderData = await orderCollection.findOne({ _id: req.session.currentOrder._id})
+  if(orderData.paymentType =='online'){
+    await orderCollection.updateOne({ _id: req.session.currentOrder._id}, { $set : { paymentType: 'COD'   }  })
+  }
+  let x = await cartCollection.findByIdAndUpdate({ _id: req.session.currentOrder._id}).populate("productId");
+  res.render("userViews/checkout2", {
+    signIn: req.session.signIn,
+    user: req.session.user,
+    orderCartData: cartData,
+    orderData: req.session.currentOrder,
+  });
+  //delete product from cart since the order is placed
+  await cartCollection.deleteMany({ userId: req.session.userInfo._id });
+  } catch (error) {
+    console.log(error)
+  }
 };
 
+const getcheckoutpagefn = async (req, res) => {
+    try {
+        console.log("lokesh")
+      const addresscheck = await addressCollection.find({userId:req.session?.userInfo?._id})
+      if(addresscheck.length==0){
+          res.redirect("/addressAdd")
+      }else{
+        let cartData = await cartCollection
+        .find({ userId: req.session.userInfo._id, productId: req.params.id })
+        .populate("productId");
+        let addressData = await addressCollection.find({
+          userId: req.session.userInfo._id,
+          
+        });
+        console.log(addressData)
 
 
+     console.log("Hunais")
+      req.session.currentOrder = await orderCollection.create({
+        userId: req.session.userInfo._id,
+        orderNumber: (await orderCollection.countDocuments()) + 1,
+        orderDate: new Date(),
+        addressChosen: JSON.parse(JSON.stringify(addressData[0])),
+        cartData: await grandTotal(req),
+        grandTotalCost: req.session.grandTotal,
+      });
+      // const coupons = await couponCollection.find(); 
+    console.log("ljdfadlf")
+      let userCartData = await grandTotal(req);
+      console.log("dvykjiu")
+      req.session.save()
+      console.log("jggghfvd")
+      console.log(req.session.address)
+      res.render("userViews/checkout1", {
+        signIn: req.session.signIn,
+        user: req.body.user,
+        currentUser: req.session.userInfo,
+        grandTotal: req.session.grandTotal,
+        userCartData,
+        cartData,
+        addressData:addressData,
+        addressData,
+        // coupons: coupons 
+      });
+      }
+      
+    } catch (error) {
+      console.log(error);
+      res.redirect("/cart");
+    }
+  };
 
+//   const getcheckoutpagefn=async(req,res)=>{
 
+//     try{
+//       const cart= await cartCollection.find({userId:req.query.user}).populate('productId')
+       
+//       Sum=0
+//       for(let i=0;i<cart.length;i++){
+//        Sum=Sum+cart[i].totalCostPerProduct
+//       }
+//       req.session.grandTotal=Number(Sum)
+//       const address= await addressCollection.find({userId:req.query.user})
+      
+//       res.render('userViews/checkout1',{userLogged:req.session.logged,grandTotal:req.session.grandTotal,addressDet:address})
+//     }
+//     catch(error){
+//       console.log(error)
+//     }
+//   }
 
 
 
@@ -372,7 +478,7 @@ module.exports = {
     decQty,
     incQty,
     deleteFromCart,
-    // getcheckoutpagefn
+    getcheckoutpagefn,
     orderPlacedEnd,
     orderPlaced
 }

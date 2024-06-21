@@ -1,14 +1,11 @@
-const adminAuth = function (req, res, next) {
-    try {
-        if (req.session.admin) {
+module.exports = function(req,res,next){
+    try{
+        if(req.session.admin){
             next()
-        } else {
+        }else{
             res.redirect('/admin')
         }
-    } catch (err) {
+    }catch (err){
         console.log(err);
     }
 }
-
-
-module.exports = adminAuth

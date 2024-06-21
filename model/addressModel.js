@@ -6,7 +6,7 @@ const mongoose = require("mongoose")
 const addressSchema = new mongoose.Schema({
     userId:{ type: mongoose.Types.ObjectId, ref:'users'},
     fname: String,
-    lname: String,
+    // lname: String,
     phone:Number,
     Address:String,
     State:String,

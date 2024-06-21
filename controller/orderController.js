@@ -1,5 +1,8 @@
 const orderCollection = require("../model/orderModel")
 const userCollection = require("../model/userModel")
+const addressCollection = require('../model/addressModel')
+const formatDate = require("../services/dateFormate")
+const razorpay = require("razorpay")
 
 
 const allordersfn =  async (req, res) => {
@@ -43,6 +46,7 @@ const singleorderfn =  async (req, res) => {
     let orderData = await orderCollection
       .findOne({ _id: req.params.id })
       .populate("addressChosen");
+      console.log(orderData)
     let isCancelled = orderData.orderStatus == "Cancelled";
     let isReturn = orderData.orderStatus == "Return";
     res.render("userViews/singleorderpage", {
@@ -87,9 +91,119 @@ const cancelOrder = async (req, res) => {
   }
 
 
+
+  // this is admin side order management 
+
+
+
+  const adminOrder=async(req,res)=>{
+    try{
+      let count = await orderCollection.find().estimatedDocumentCount();
+      let orderDetails = await orderCollection
+        .find().sort({orderNumber: -1})
+        .populate("userId")
+      // res.render("admin/orderManagement", { orderData, count, limit, page });
+    console.log(orderDetails.grandTotalCost)
+      res.render('adminPages/ordermanagement',{orderDet:orderDetails})
+    }
+    catch(error){
+        console.log(error)
+    }
+}
+
+const changeStatusPending = async (req, res) => {
+  try {
+    console.log("Pending")
+    await orderCollection.findOneAndUpdate(
+      { _id: req.params.id },
+      { $set: { orderStatus: "Pending" } }
+    );
+    res.redirect("/order");
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+
+const changeStatusShipped = async (req, res) => {
+  try {
+    console.log("Shipped")
+    await orderCollection.findOneAndUpdate(
+      { _id: req.params.id },
+      { $set: { orderStatus: "Shipped" } }
+    );
+    res.redirect("/order");
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+//deliverd
+const changeStatusDelivered = async (req, res) => {
+  try {
+    console.log("Delivered")
+    await orderCollection.findOneAndUpdate(
+      { _id: req.params.id },
+      { $set: { orderStatus: "Delivered" } }
+    );
+    res.redirect("/order");
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+const changeStatusReturn = async (req, res) => {
+  try {
+    console.log("Return")
+    await orderCollection.findOneAndUpdate(
+      { _id: req.params.id },
+      { $set: { orderStatus: "Return" } }
+    );
+    res.redirect("/order");
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+const changeStatusCancelled = async (req, res) => {
+  try {
+    let orderData = await orderCollection
+      .findOne({ _id: req.params.id })
+      .populate("userId");
+    await walletCollection.findOneAndUpdate(
+       { userId : orderData.userId._id  }, 
+       { walletBalance: orderData.grandTotalCost })
+
+    await userCollection.findByIdAndUpdate(
+      { _id: orderData.userId._id },
+      { wallet: orderData.grandTotalCost }
+    );
+    orderData.orderStatus = "Cancelled";
+    orderData.save();
+    res.redirect("/adminPages/orderManagement");
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+
 module.exports = {
     allordersfn,
     singleorderfn,
     cancelOrder,
-    returnRequest
+    returnRequest,
+
+
+    adminOrder,
+    changeStatusPending,
+    changeStatusShipped,
+    changeStatusDelivered,
+    changeStatusReturn,
+    changeStatusCancelled
+   
 }

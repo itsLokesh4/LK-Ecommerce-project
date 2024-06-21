@@ -232,8 +232,8 @@ module.exports = {
 
 const singleProduct = async (req, res) => {
     try {
+        console.log(req.query)
         const productDetails = await productCollection.findOne({ _id: req.query.id }).populate('parentCategory')
-        // console.log(req.query)
         // const categoryDetails = await categoryCollection.findOne({ _id: req.query.id })
         // console.log(productDetails)
         res.render('userViews/singleProduct', { _id: req.body.user_id, userLogged: req.session.logged, productDet: productDetails })
@@ -244,14 +244,21 @@ const singleProduct = async (req, res) => {
 
 
 
+const products = async (req,res) =>{
+    try { 
+        res.render('userViews/Products')
+    }catch (err){
+        console.log(err)
+    }
+}
 
 // { product: product }
 
 
 const shopPage = async (req, res) => {
     try {
-        const productDetails = await productCollection.find()
-        res.render('userViews/shop', { productDet: productDetails })
+        const productDetails = await productCollection.find({isListed:true})
+        res.render('userViews/Products', { productDet: productDetails })
     }
 
     catch (err) {
@@ -343,7 +350,89 @@ const PostpassChange = async (req, res) => {
     }
 }
 
+const forgetpage1fn = async(req,res)=>{
+    try{
+        req.session.forEmailExist
+        res.render("userViews/forgetPage1",{EmailExsit:req.session.forEmailExsit })
+    }catch(err){
+        console.log(err)
+    }
+}
 
+
+const forgetpage2fn = async(req,res)=>{
+    try{
+       const forgetEmail = req.body.email
+       const emailcheck = await userCollection.findOne({email:forgetEmail})
+       if(emailcheck){
+        req.session.resendOtp = otp
+        req.session.forEmailExist = false
+        res.render("userViwes/forgetpage2")
+       }else{
+        req.session.forEmailExist  = true
+        res.redirect("back")
+       }
+    }catch (err){
+        console.log(err)
+    }
+}
+
+const forgetpage3fn = async(req,res)=>{
+    try{
+        const otp = Number(req.body.resendOtp)
+        const ourotp = req.session.resendOtp
+        if(otp === ourotp){
+            res.render("userViews/forgetpage3")
+        }else{
+            req.session.resendOtpinvalid = true
+            res.render("userViews/forgetpage2")
+        }
+
+    }catch(err){
+        console.log(err)
+    }
+}
+
+const forgetpage4fn = async(req,res)=>{
+   
+        const newpass = req.body.newPassword
+        const email= req.session.forgetEmail
+        const user = await userCollection.findOne({email:email});
+        const passwordHash = await userCollection.findByIdAndUpdate(
+            {_id: user._id},
+            {
+                $set:{ Password: passwordHash}
+            })
+        res.redirect("/login")
+    }
+
+ 
+    const optVerify = async (req, res) => {
+        const otp = req.session.otp
+        if (otp === Number(req.body.otp)) {
+          const userdetails = req.session.userInfo
+          const ReferalCode = Math.random().toString(36).substring(2,9);//referal code
+          console.log(userdetails)
+          const {fname,lname,email,Password,confirmPass,Phone} = userdetails
+          await userCollection({fname,lname,email,Password,confirmPass,Phone,ReferalCode}).save()
+          if(req.session.referalCodeuseage)
+          {
+            const referalUser = await userCollection.findOne({ReferalCode:req.session?.referalCodeuseage?.referralCode})
+            await walletCollection.updateOne({userId:referalUser._id},{$inc:{walletBalance:500}})
+      
+          }
+          req.session.userName = userdetails.fname + userdetails.lname
+          req.session.email = userdetails.email
+          req.session.islogin = true
+          const userDetail = await userCollection.findOne({email:userdetails.email})
+          await walletCollection.create({userId : userDetail._id })
+          req.session.userInfo = userDetail
+          res.redirect("/")
+        } else {
+          res.render("userViews/otppage", { invalidotp: "OTP Invalid" })
+        }
+      }
+      
 
 module.exports = {
     landingPage,
@@ -362,5 +451,12 @@ module.exports = {
     ProfileEditpage,
     postEditprofilefn,
     passchange,
-    PostpassChange
+    PostpassChange,
+    products,
+
+    forgetpage1fn,
+    forgetpage2fn,
+    forgetpage3fn,
+    forgetpage4fn,
+    optVerify
 }

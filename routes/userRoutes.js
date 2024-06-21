@@ -1,4 +1,5 @@
 const express = require("express");
+
 const userController = require("../controller/userController");
 const { isUser, isBlocked } = require("../middleware/userAuth.js")
 const router = express.Router();
@@ -7,7 +8,8 @@ const router = express.Router();
 const addressController = require('../controller/addressController')
 const cartController = require('../controller/cartController')
 const orderController = require('../controller/orderController.js')
-
+const couponController = require('../controller/couponController.js');
+const userAuthFetch = require("../middleware/userAuthFetch.js");
 
 
 
@@ -26,12 +28,19 @@ router.get("/sendOtp", userController.otpPage)
 router.post("/verifyOtp", userController.verifyOtp)
 router.post('/resendOtp', userController.resendOtp)
 router.post("/login", userController.userLogin)
-router.get('/shop', userController.shopPage)
+router.get('/Products', userController.shopPage)
 router.get("/singleProduct",isUser,isBlocked, userController.singleProduct)
+router.get("/Products",isUser,isBlocked, userController.products)
 
 
 
+//  forget password processq
 
+router.get('/forget1',isBlocked,userController.forgetpage1fn)
+router.post('/forget2',isBlocked,userController.forgetpage2fn)
+router.post('/forget3',isBlocked,userController.forgetpage3fn)
+router.post("/forget4",isBlocked,userController.forgetpage4fn)
+router.post("/resendOTP",isBlocked,userController.optVerify)
 
 // pageing process
 
@@ -66,7 +75,7 @@ router.get('/addto-cart', isUser, cartController.addtoCart)
 router.put('/cart/decQty/:id', isBlocked, cartController.decQty)
 router.put('/cart/incQty/:id', isBlocked, cartController.incQty)
 router.delete('/cart/delete/:id', isUser, isBlocked, cartController.deleteFromCart)
-// router.get("/checkout",isBlocked,cartController.getcheckoutpagefn)
+router.get("/checkout",isBlocked,cartController.getcheckoutpagefn)
 
 
 
@@ -77,12 +86,18 @@ router.delete('/cart/delete/:id', isUser, isBlocked, cartController.deleteFromCa
 
 router.get("/orders", isUser, orderController.allordersfn)
 router.get("/orderStatus/:id", isBlocked, orderController.singleorderfn)
-// userRouter.post("/razorpayOrderCreated:id",isBlocked,isUser,genOrder)
+// // userRouter.post("/razorpayOrderCreated:id",isBlocked,isUser,genOrder)
 router.post('/checkout/orderPlaced', isBlocked, isUser, cartController.orderPlaced);
 router.all('/confirmOrder', isBlocked, isUser, cartController.orderPlacedEnd)
 router.put('/account/orderList/orderStatus/cancelOrder/:id', isBlocked, isUser, orderController.cancelOrder)
 router.put('/account/orderList/orderStatus/returnorder/:id', isBlocked, isUser, orderController.returnRequest)
 // userRouter.get('/account/orderList/orderStatus/downloadInvoice/:id',isBlocked,isUser,downloadInvoice)
+
+
+
+// Coupon Management
+router.post('/user/applyCoupon',userAuthFetch,couponController.applyCoupon)
+router.post('/user/removeCoupon',userAuthFetch,couponController.removeCoupon)
 
 
 

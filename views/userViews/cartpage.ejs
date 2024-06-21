@@ -21,7 +21,7 @@
         <div class="col-md-6">
           <ol class="breadcrumb pull-right">
             <li>
-              <a href='/ProductCategory'>Shop More</a>
+              <a href='/'>Shop More</a>
             </li>
             <li class="active">Cart Page</li>
           </ol>
@@ -78,7 +78,8 @@
                                 style="color: black; width: 45px; margin-top: 30px;"
                                 name="trash-outline"></ion-icon></a>
                             <span class="cartImage"><img style="width: 90px; height: 80px"
-                                src="/upload/<%= item.productId.productImage1%>" alt="image"></span>
+                                 src="assets/img/uploads/<%= item.productId.productImage[0]%>" alt="image" ></span>
+                                 <!-- assets/img/uploads -->
                           </td>
                           <td class="" style="width: fit-content;">
                             <%=item.productId.productName%>

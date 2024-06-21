@@ -28,12 +28,19 @@
 
 
   <style>
-    .container {
-      margin: 0 auto;
+    /* .container { */
+      /* margin: 0 auto; */
       /* Centers the container horizontally */
-      max-width: 600px;
+      /* max-width: 600px; */
       /* Optional: Set maximum width of the container */
-    }
+    /* } */
+    .container {
+  margin: 0 auto;
+  max-width: 600px;
+}
+.jumbotron {
+  text-align: center;
+}
 
     .error {
       color: red;
@@ -97,11 +104,11 @@
 
 
 
-          <div class="form-group">
-            <label for="images">Add image</label>
+        <div class="form-group">
+          <label for="images">Add image</label>    
             <input type="file" name="images" value="productDet.productImages[i]" class="form-control-file" id="images"
               multiple>
-          </div>
+        </div>
 
           <br>
           <div class="form-group">
